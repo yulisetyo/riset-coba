@@ -35,6 +35,11 @@ Route::group(['prefix' => 'zigzag'], function () {
 	Route::post('/bar', 'ZigzagController@bar');
 });
 
+Route::group(['prefix' => 'enkripsi'], function () {
+	Route::get('/', 'ZigzagController@venkripsi');
+	Route::post('/', 'ZigzagController@enkripsi');
+});
+
 Route::group(['prefix' => 'konversi'], function () {
 	Route::get('/', 'ZigzagController@letterConvertion');
 });
@@ -42,7 +47,12 @@ Route::group(['prefix' => 'konversi'], function () {
 Route::group(['prefix' => 'weton'], function () {
 	Route::get('/', 'WetonController@index');
 });
+
 Route::group(['prefix' => 'map'], function () {
 	Route::get('/', 'RiskMapController@map');
 	Route::get('/show', 'RiskMapController@index');
+});
+
+Route::group(['prefix' => 'test'], function () {
+	Route::get('/', 'TestController@index');
 });

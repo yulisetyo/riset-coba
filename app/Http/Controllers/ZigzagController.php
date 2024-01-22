@@ -361,6 +361,85 @@ class ZigzagController extends Controller
 
 		return $rows;
 	}
+	
+	/**
+	 * description
+	 */
+	public function enkripsi(Request $request)
+	{
+		$plaintext = strtoupper($request->input('plaintext'));
+		
+		$cnt = strlen($plaintext);
+		
+		for	($i = 0; $i < $cnt; $i++) {
+			$piece[] = substr($plaintext, $i, 1); // slicing plaintext into letters
+			$key[] = array_search($piece[$i], $this->arrChar()); // getting key of array
+			$hex[] = $this->arrHex()[$key[$i]]; // convert key of array of hex's array
+			$zig[] = $this->arrZigzag()[$key[$i]]; // convert key of array to zigzag's array
+			$bin[] = $this->arrBin()[$key[$i]];
+			$cip[] = $this->arrZigzag()[$key[$i]];
+		}
+		
+		$cipher = implode("", $cip);
+		$heksa = implode("", $hex);
+		$biner = implode("", $bin);
+		$reverse = strrev($biner);
+		
+		$xor = [];
+		
+		for ($x = 0; $x < strlen($biner); $x++) {
+			$pbin[] = substr($biner, $x, 1);
+			$prev[] = substr($reverse, $x, 1);
+			
+			$xor[] = $this->logikaXor((int)$pbin[$x], (int)$prev[$x]);
+		}
+		
+		$jxor = implode("", $xor);
+		
+		for ($n = 0; $n < strlen($jxor); $n++) {
+			if ($n == 0) {
+				$newDec[] = substr($jxor, 0, 4);
+			} else {
+				$z = $n * 4;
+				
+				$max = strlen($jxor) - 4;
+				
+				if ($z < $max) {
+					$newDec[] = substr($jxor, $z, 4);
+				}
+				
+				if ($z == $max) {
+					$newDec[] = substr($jxor, $max, 4);
+				}
+			}
+		}
+		
+		for ($a = 0; $a < count($newDec); $a++) {
+			$knc[] = array_search($newDec[$a], $this->arrExor());
+			
+		}
+		
+		$newTxt = implode("", $knc);
+		
+		return [
+			'cip' => $cipher,
+			'hex' => $heksa,
+			'bin' => $biner,
+			'rev' => strrev($biner),
+			'xor' => $jxor,
+			'knc' => $newTxt,
+		];
+	}
+	
+	/**
+	 * description
+	 */
+	public function venkripsi()
+	{
+		$data = [];
+		
+		return view('view-enkripsi', $data);
+	}
 
 	/**
 	 * description
@@ -456,5 +535,21 @@ class ZigzagController extends Controller
 		];
 
 		return $arrExor;
+	}
+	
+	/**
+	 * description
+	 */
+	public function logikaXor($p1, $p2)
+	{
+		if ($p1 == 0 && $p2 == 0) {
+			return 0;
+		} else if ($p1 == 1 && $p2 == 0) {
+			return 1;
+		} else if ($p1 == 0 && $p2 == 1) {
+			return 1;
+		} else {
+			return 0;
+		}
 	}
 }
